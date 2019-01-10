@@ -21,37 +21,30 @@ package org.ff4j.web.thymeleaf;
  */
 
 import org.ff4j.FF4j;
-import org.thymeleaf.Arguments;
-import org.thymeleaf.dom.Element;
-import org.thymeleaf.processor.attr.AbstractConditionalVisibilityAttrProcessor;
+import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.engine.AttributeName;
+import org.thymeleaf.model.IProcessableElementTag;
+import org.thymeleaf.standard.processor.AbstractStandardConditionalVisibilityTagProcessor;
+import org.thymeleaf.templatemode.TemplateMode;
 
 /**
  * Created by benoitmeriaux on 08/01/15.
  */
-public class FF4jEnableAttrProcessor extends AbstractConditionalVisibilityAttrProcessor {
+public class FF4jEnableAttrProcessor extends AbstractStandardConditionalVisibilityTagProcessor {
 
-    protected FF4jEnableAttrProcessor(final String attributeName) {
-        super(attributeName);
-    }
 
-    protected FF4jEnableAttrProcessor() {
-        super("enable");
-    }
-
-    @Override
-    public int getPrecedence() {
+    protected FF4jEnableAttrProcessor(final String dialectPrefix) {
         // => si feature enable, c'est ultra prioritaire mais moins que si elle est activée:-)
-        return 11;
+        super(TemplateMode.HTML, dialectPrefix, "enable", 11);
     }
 
     @Override
-    protected boolean isVisible(Arguments arguments, Element element, String attributeName) {
-        final String feature = element.getAttributeValue(attributeName);
+    protected boolean isVisible(ITemplateContext context, IProcessableElementTag tag, AttributeName attributeName, String attributeValue) {
+        final String feature = attributeName.getAttributeName();
         if (feature == null || feature.trim().equals("")) {
             return false;
         }
         FF4j ff4j = new FF4j();//getFF4j(arguments.getContext());
         return ff4j.check(feature);
     }
-
 }

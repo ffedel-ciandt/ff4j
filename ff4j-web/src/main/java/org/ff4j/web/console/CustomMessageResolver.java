@@ -21,6 +21,11 @@ package org.ff4j.web.console;
  */
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.messageresolver.IMessageResolver;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
@@ -29,50 +34,46 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.thymeleaf.Arguments;
-import org.thymeleaf.messageresolver.IMessageResolver;
-import org.thymeleaf.messageresolver.MessageResolution;
-
 /**
  * All message in the same properties file embedded.
  *
  * @author Cedrick LUNVEN (@clunven)
  */
 public class CustomMessageResolver implements IMessageResolver {
-	
+
 	/** Name of property file. */
 	private static final String MSG_FILE = "ff4j-messages";
-	
+
 	/** Name of property file. */
 	private static final String MSG_FILE_EXTENSION = ".properties";
-	
+
 	/** Logger for this class. */
-    public static final Logger LOGGER = LoggerFactory.getLogger(CustomMessageResolver.class);
-   
+	public static final Logger LOGGER = LoggerFactory.getLogger(CustomMessageResolver.class);
+
 	/** Properties per Locale. */
-    protected Map < String , Properties > messages = new HashMap< String, Properties >();
-    
-    /** Default properties "messages.properties". */
-    protected final Properties defaultMessages;
-    
-    public CustomMessageResolver() {
-    	super();
-        this.defaultMessages = new Properties();
-    }
-    
+	protected Map<String, Properties> messages = new HashMap<String, Properties>();
+
+	/**
+	 * Default properties "messages.properties".
+	 */
+	protected final Properties defaultMessages;
+
+	public CustomMessageResolver() {
+		super();
+		this.defaultMessages = new Properties();
+	}
+
 	/** {@inheritDoc} */
 	public void initialize() {
 		try {
 			defaultMessages.load(
 					CustomMessageResolver.class.getClassLoader()
-						.getResourceAsStream(MSG_FILE + MSG_FILE_EXTENSION));
+							.getResourceAsStream(MSG_FILE + MSG_FILE_EXTENSION));
 		} catch (IOException e) {
 			LOGGER.error("Cannot load properties", e);
 		}
 	}
-	
+
 	/**
 	 * Load property file from locale and put in cache.
 	 *
@@ -95,26 +96,32 @@ public class CustomMessageResolver implements IMessageResolver {
 					LOGGER.error("Cannot load properties", e);
 				}
 			}
-        }
+		}
 		Properties target = messages.get(locale.getLanguage());
 		return target != null ? target : defaultMessages;
 	}
-	
+
 	/** {@inheritDoc} */
-	public MessageResolution resolveMessage(Arguments args, String key, Object[] msgParams) {
-		final Locale locale = args.getContext().getLocale();
-        String targetMsg = resolveProperties(locale).getProperty(key);
+	public String resolveMessage(ITemplateContext context, Class<?> origin, String key, Object[] messageParameters) {
+		final Locale locale = context.getLocale();
+		String targetMsg = resolveProperties(locale).getProperty(key);
 		if (targetMsg == null) {
 			targetMsg = "<span style=\"color:red\">" + key + " not found</span>";
-		} else if (msgParams != null && msgParams.length > 0) {
-			targetMsg = new MessageFormat(targetMsg, args.getContext().getLocale()).format(msgParams);
+		} else if (messageParameters != null && messageParameters.length > 0) {
+			targetMsg = new MessageFormat(targetMsg, context.getLocale()).format(messageParameters);
 		}
-		return new MessageResolution(targetMsg);
-	}	
+		return targetMsg;
+	}
 
 	/** {@inheritDoc} */
 	public Integer getOrder() {
 		return 0;
+	}
+
+
+	@Override
+	public String createAbsentMessageRepresentation(ITemplateContext context, Class<?> origin, String key, Object[] messageParameters) {
+		return "_NOT_TRANSLATED";
 	}
 
 	/** {@inheritDoc} */

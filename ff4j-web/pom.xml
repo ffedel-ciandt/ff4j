@@ -7,14 +7,14 @@
 	<artifactId>ff4j-web</artifactId>
 	<packaging>jar</packaging>
 	<name>ff4j-web</name>
-
+	<version>1.7.1-spring-boot-2</version>
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 	<!-- ~ PARENT ~ -->
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 	<parent>
 		<groupId>org.ff4j</groupId>
 		<artifactId>ff4j-parent</artifactId>
-		<version>1.7.1-SNAPSHOT</version>
+		<version>1.7.1</version>
 	</parent>
 
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -33,7 +33,7 @@
 		<dependency>
 			<artifactId>ff4j-core</artifactId>
 			<groupId>org.ff4j</groupId>
-			<version>${project.version}</version>
+			<version>1.7.1</version>
 		</dependency>
 		
 		<!-- web -->
@@ -80,6 +80,7 @@
 		<dependency>
 			<groupId>org.thymeleaf</groupId>
 			<artifactId>thymeleaf</artifactId>
+			<version>3.0.9.RELEASE</version>
 		</dependency>
 		
 		<!-- Support for tests -->
